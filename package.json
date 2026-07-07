@@ -1,0 +1,25 @@
+{
+  "name": "backend-turnos-reservas",
+  "version": "1.0.0",
+  "main": "server.js",
+  "description": "API base para Nexo Booking: reservas, turnos y gestión de servicios del negocio",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "mongodb",
+    "backend",
+    "turnos",
+    "reservas"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1"
+  }
+}
