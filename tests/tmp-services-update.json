@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Reserva de mesa",
+    "description": "Reserva para un turno en el restaurante",
+    "duration": 60,
+    "price": 0,
+    "category": "reservas",
+    "available": true
+  },
+  {
+    "id": 2,
+    "name": "Turno premium",
+    "description": "Asignación de turno con prioridad",
+    "duration": 45,
+    "price": 500,
+    "category": "turnos",
+    "available": true
+  },
+  {
+    "id": 3,
+    "name": "Peeling facial",
+    "description": "Tratamiento facial",
+    "duration": 40,
+    "price": 2200,
+    "category": "bienestar",
+    "available": true
+  }
+]

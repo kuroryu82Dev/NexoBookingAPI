@@ -30,17 +30,42 @@ NODE_ENV=development
 npm start
 ```
 
+## Endpoints de servicios
+
+- `GET /services` - lista todos los servicios
+- `GET /services/:id` - obtiene un servicio por id
+- `POST /services` - crea un servicio nuevo
+- `PUT /services/:id` - actualiza un servicio existente
+- `DELETE /services/:id` - elimina un servicio
+
+Ejemplo de petición `POST /services`:
+
+```json
+{
+  "name": "Masaje relajante",
+  "description": "Masaje para reducir estrés",
+  "duration": 45,
+  "price": 3000,
+  "category": "bienestar",
+  "available": true
+}
+```
+
+## Persistencia
+
+Los servicios se guardan en `src/data/services.json`. El `ServiceManager` carga los datos desde ese archivo y mantiene la información cuando se crean, actualizan o eliminan servicios.
+
 ## Formato de un servicio
 
-```js
+```json
 {
-  id,
-  name,
-  description,
-  duration,
-  price,
-  category,
-  available
+  "id": 1,
+  "name": "Reserva de mesa",
+  "description": "Reserva para un turno en el restaurante",
+  "duration": 60,
+  "price": 0,
+  "category": "reservas",
+  "available": true
 }
 ```
 
