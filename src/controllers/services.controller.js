@@ -7,8 +7,31 @@ function jsonError(res, status, message) {
 }
 
 export function getAllServices(req, res) {
-    const services = serviceManager.getServices();
-    res.status(200).json({ status: 'success', data: services });
+    const { category, available } = req.query;
+
+    if (category !== undefined && (typeof category !== 'string' || !category.trim())) {
+        return jsonError(res, 400, 'El filtro category debe ser una cadena no vacía');
+    }
+
+    if (available !== undefined && available !== 'true' && available !== 'false') {
+        return jsonError(res, 400, 'El filtro available debe ser true o false');
+    }
+
+    let services = serviceManager.getServices();
+
+    if (category !== undefined) {
+        const normalizedCategory = category.trim().toLowerCase();
+        services = services.filter(
+            (service) => service.category.toLowerCase() === normalizedCategory
+        );
+    }
+
+    if (available !== undefined) {
+        const isAvailable = available === 'true';
+        services = services.filter((service) => service.available === isAvailable);
+    }
+
+    return res.status(200).json({ status: 'success', data: services });
 }
 
 export function getServiceById(req, res) {

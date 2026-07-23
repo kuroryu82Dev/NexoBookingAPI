@@ -13,7 +13,7 @@ app.use('/mesas', mesasRoutes);
 
 app.get('/', (req, res) => {
     res.status(200).json({
-        estatus: 'success',
+        status: 'success',
         message: 'Nexo Booking API - primera entrega'
     });
 });

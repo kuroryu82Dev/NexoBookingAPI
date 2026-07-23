@@ -1,0 +1,11 @@
+[
+  {
+    "id": "res-1784757806595",
+    "clienteId": "cli-test",
+    "mesaId": "mesa-test",
+    "fecha": "2026-07-10",
+    "hora": "20:30",
+    "personas": 4,
+    "estado": "CANCELADA"
+  }
+]

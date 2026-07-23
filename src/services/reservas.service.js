@@ -1,45 +1,19 @@
-import { createReservaDto } from './reservas.dto.js';
+import ReservasManager from '../managers/ReservasManager.js';
 
-const reservas = [];
+const reservasManager = new ReservasManager();
 
 export function listarReservas() {
-  return reservas;
+  return reservasManager.getReservas();
 }
 
 export function crearReserva(payload, mesa) {
-  const dto = createReservaDto(payload);
-  const nuevaReserva = {
-    id: `res-${Date.now()}`,
-    clienteId: dto.clienteId,
-    mesaId: mesa.id,
-    fecha: dto.fecha,
-    hora: dto.hora,
-    personas: dto.personas,
-    estado: 'PENDIENTE'
-  };
-
-  reservas.push(nuevaReserva);
-  return nuevaReserva;
+  return reservasManager.createReserva(payload, mesa);
 }
 
 export function confirmarReserva(id) {
-  const reserva = reservas.find((item) => item.id === id);
-
-  if (!reserva) {
-    throw new Error('Reserva no encontrada');
-  }
-
-  reserva.estado = 'CONFIRMADA';
-  return reserva;
+  return reservasManager.confirmarReserva(id);
 }
 
 export function cancelarReserva(id) {
-  const reserva = reservas.find((item) => item.id === id);
-
-  if (!reserva) {
-    throw new Error('Reserva no encontrada');
-  }
-
-  reserva.estado = 'CANCELADA';
-  return reserva;
+  return reservasManager.cancelarReserva(id);
 }

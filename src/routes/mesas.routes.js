@@ -5,7 +5,7 @@ import {
   crearMesaController,
   actualizarMesaController,
   eliminarMesaController
-} from '../../controllers/mesas.controller.js';
+} from '../controllers/mesas.controller.js';
 
 const router = express.Router();
 

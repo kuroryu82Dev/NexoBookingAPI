@@ -2,33 +2,34 @@ import { listarReservas, crearReserva, confirmarReserva, cancelarReserva } from 
 import { findBestMesaForRequest } from '../services/mesas.service.js';
 
 export function listarReservasController(req, res) {
-  res.status(200).json({ estatus: 'success', data: listarReservas() });
+  res.status(200).json({ status: 'success', data: listarReservas() });
 }
 
 export function crearReservaController(req, res) {
   try {
-    const mesa = findBestMesaForRequest(req.body);
+    const reservas = listarReservas();
+    const mesa = findBestMesaForRequest(req.body, reservas);
     const reserva = crearReserva(req.body, mesa);
-    res.status(201).json({ estatus: 'success', data: reserva, mesa });
+    res.status(201).json({ status: 'success', data: reserva, mesa });
   } catch (error) {
-    res.status(400).json({ estatus: 'error', message: error.message });
+    res.status(400).json({ status: 'error', message: error.message });
   }
 }
 
 export function confirmarReservaController(req, res) {
   try {
     const reserva = confirmarReserva(req.params.id);
-    res.status(200).json({ estatus: 'success', data: reserva });
+    res.status(200).json({ status: 'success', data: reserva });
   } catch (error) {
-    res.status(404).json({ estatus: 'error', message: error.message });
+    res.status(404).json({ status: 'error', message: error.message });
   }
 }
 
 export function cancelarReservaController(req, res) {
   try {
     const reserva = cancelarReserva(req.params.id);
-    res.status(200).json({ estatus: 'success', data: reserva });
+    res.status(200).json({ status: 'success', data: reserva });
   } catch (error) {
-    res.status(404).json({ estatus: 'error', message: error.message });
+    res.status(404).json({ status: 'error', message: error.message });
   }
 }

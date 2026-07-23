@@ -4,7 +4,7 @@ import {
   crearReservaController,
   confirmarReservaController,
   cancelarReservaController
-} from '../../controllers/reservas.controller.js';
+} from '../controllers/reservas.controller.js';
 
 const router = express.Router();
 
