@@ -1,6 +1,4 @@
-import ServiceManager from '../managers/ServiceManager.js';
-
-const serviceManager = new ServiceManager();
+import { serviceManager } from '../managers/managerInstances.js';
 
 function jsonError(res, status, message) {
     return res.status(status).json({ status: 'error', message });
@@ -35,9 +33,9 @@ export function getAllServices(req, res) {
 }
 
 export function getServiceById(req, res) {
-    const id = Number(req.params.id);
+    const id = Number(req.params.sid ?? req.params.id);
 
-    if (Number.isNaN(id)) {
+    if (!Number.isInteger(id) || id <= 0) {
         return jsonError(res, 400, 'Id inválido');
     }
 
@@ -59,9 +57,9 @@ export function createService(req, res) {
 }
 
 export function updateService(req, res) {
-    const id = Number(req.params.id);
+    const id = Number(req.params.sid ?? req.params.id);
 
-    if (Number.isNaN(id)) {
+    if (!Number.isInteger(id) || id <= 0) {
         return jsonError(res, 400, 'Id inválido');
     }
 
@@ -77,9 +75,9 @@ export function updateService(req, res) {
 }
 
 export function deleteService(req, res) {
-    const id = Number(req.params.id);
+    const id = Number(req.params.sid ?? req.params.id);
 
-    if (Number.isNaN(id)) {
+    if (!Number.isInteger(id) || id <= 0) {
         return jsonError(res, 400, 'Id inválido');
     }
 
