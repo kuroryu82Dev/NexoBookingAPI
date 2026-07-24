@@ -10,9 +10,9 @@ import {
 const router = express.Router();
 
 router.get('/', getAllServices);
-router.get('/:id', getServiceById);
+router.get('/:sid', getServiceById);
 router.post('/', createService);
-router.put('/:id', updateService);
-router.delete('/:id', deleteService);
+router.put('/:sid', updateService);
+router.delete('/:sid', deleteService);
 
 export default router;

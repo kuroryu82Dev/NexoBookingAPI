@@ -32,11 +32,11 @@ npm start
 
 ## Endpoints de servicios
 
-- `GET /services` - lista todos los servicios
-- `GET /services/:id` - obtiene un servicio por id
-- `POST /services` - crea un servicio nuevo
-- `PUT /services/:id` - actualiza un servicio existente
-- `DELETE /services/:id` - elimina un servicio
+- `GET /api/services` - lista todos los servicios
+- `GET /api/services/:sid` - obtiene un servicio por id
+- `POST /api/services` - crea un servicio nuevo
+- `PUT /api/services/:sid` - actualiza un servicio existente
+- `DELETE /api/services/:sid` - elimina un servicio
 
 Ejemplo de petición `POST /services`:
 
@@ -54,6 +54,28 @@ Ejemplo de petición `POST /services`:
 ## Persistencia
 
 Los servicios se guardan en `src/data/services.json`. El `ServiceManager` carga los datos desde ese archivo y mantiene la información cuando se crean, actualizan o eliminan servicios.
+
+## Endpoints de reservas
+
+- `POST /api/bookings` - crea una reserva con su arreglo de servicios vacío
+- `GET /api/bookings/:bid` - obtiene una reserva por id
+- `POST /api/bookings/:bid/services/:sid` - agrega un servicio a la reserva
+
+Las reservas se guardan en `src/data/bookings.json`. Si se agrega nuevamente el
+mismo servicio, se incrementa su propiedad `quantity`.
+
+Ejemplo de petición `POST /api/bookings`:
+
+```json
+{
+  "clientName": "Ana Pérez",
+  "clientEmail": "ana@example.com",
+  "date": "2026-08-10",
+  "time": "18:30",
+  "status": "PENDIENTE",
+  "services": []
+}
+```
 
 ## Formato de un servicio
 
