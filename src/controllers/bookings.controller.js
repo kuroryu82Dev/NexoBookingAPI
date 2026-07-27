@@ -1,4 +1,4 @@
-import { bookingManager } from '../managers/managerInstances.js';
+import { bookingManager, serviceManager } from '../managers/managerInstances.js';
 
 function jsonError(res, status, message) {
   return res.status(status).json({ status: 'error', message });
@@ -22,6 +22,11 @@ export function createBooking(req, res) {
   }
 }
 
+export function getBookings(req, res) {
+  const bookings = bookingManager.getBookings();
+  return res.status(200).json({ status: 'success', data: bookings });
+}
+
 export function getBookingById(req, res) {
   const id = parseId(req.params.bid, 'Id de reserva', res);
   if (id === null) return undefined;
@@ -38,6 +43,10 @@ export function addServiceToBooking(req, res) {
 
   const serviceId = parseId(req.params.sid, 'Id de servicio', res);
   if (serviceId === null) return undefined;
+
+  if (!serviceManager.getServiceById(serviceId)) {
+    return jsonError(res, 404, 'Servicio no encontrado');
+  }
 
   try {
     const booking = bookingManager.addServiceToBooking(bookingId, serviceId);

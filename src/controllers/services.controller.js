@@ -4,7 +4,7 @@ function jsonError(res, status, message) {
     return res.status(status).json({ status: 'error', message });
 }
 
-export function getAllServices(req, res) {
+export function getServices(req, res) {
     const { category, available } = req.query;
 
     if (category !== undefined && (typeof category !== 'string' || !category.trim())) {
@@ -31,6 +31,9 @@ export function getAllServices(req, res) {
 
     return res.status(200).json({ status: 'success', data: services });
 }
+
+// Alias temporal para no romper consumidores de la entrega anterior.
+export const getAllServices = getServices;
 
 export function getServiceById(req, res) {
     const id = Number(req.params.sid ?? req.params.id);
