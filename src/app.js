@@ -1,14 +1,14 @@
 import express from 'express';
-import servicesRoutes from './routes/services.routes.js';
+import servicesRouter from './routes/services.router.js';
 import clientesRoutes from './routes/clientes.routes.js';
 import reservasRoutes from './routes/reservas.routes.js';
 import mesasRoutes from './routes/mesas.routes.js';
-import bookingsRoutes from './routes/bookings.routes.js';
+import bookingsRouter from './routes/bookings.router.js';
 
 export const app = express();
 app.use(express.json());
-app.use('/api/services', servicesRoutes);
-app.use('/api/bookings', bookingsRoutes);
+app.use('/api/services', servicesRouter);
+app.use('/api/bookings', bookingsRouter);
 app.use('/clientes', clientesRoutes);
 app.use('/reservas', reservasRoutes);
 app.use('/mesas', mesasRoutes);

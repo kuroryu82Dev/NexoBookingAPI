@@ -57,6 +57,7 @@ Los servicios se guardan en `src/data/services.json`. El `ServiceManager` carga 
 
 ## Endpoints de reservas
 
+- `GET /api/bookings` - lista todas las reservas
 - `POST /api/bookings` - crea una reserva con su arreglo de servicios vacío
 - `GET /api/bookings/:bid` - obtiene una reserva por id
 - `POST /api/bookings/:bid/services/:sid` - agrega un servicio a la reserva

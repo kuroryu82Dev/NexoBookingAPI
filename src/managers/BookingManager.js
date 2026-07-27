@@ -98,6 +98,10 @@ class BookingManager {
     return booking;
   }
 
+  getBookings() {
+    return [...this.bookings];
+  }
+
   getBookingById(id) {
     return this.bookings.find((booking) => booking.id === id) || null;
   }
