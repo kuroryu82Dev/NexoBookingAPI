@@ -38,11 +38,11 @@ test('createBooking generates an id and persists a booking with no services', ()
   assert.deepEqual(reloaded.getBookingById(booking.id), booking);
 });
 
-test('getBookings lists all bookings', () => {
+test('getAll lists all bookings', () => {
   const { bookingManager } = createManagers();
   const booking = bookingManager.createBooking(validBooking());
 
-  assert.deepEqual(bookingManager.getBookings(), [booking]);
+  assert.deepEqual(bookingManager.getAll(), [booking]);
 });
 
 test('addServiceToBooking adds a service and increments its quantity', () => {

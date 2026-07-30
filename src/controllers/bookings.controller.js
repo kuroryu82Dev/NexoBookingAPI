@@ -23,7 +23,7 @@ export function createBooking(req, res) {
 }
 
 export function getBookings(req, res) {
-  const bookings = bookingManager.getBookings();
+  const bookings = bookingManager.getAll();
   return res.status(200).json({ status: 'success', data: bookings });
 }
 
