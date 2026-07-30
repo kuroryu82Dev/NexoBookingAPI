@@ -1,102 +1,60 @@
 # Nexo Booking API
 
-Primera entrega sencilla del proyecto Nexo Booking para el curso. La idea es mostrar una primera versión de la lógica del negocio usando clases y objetos en JavaScript.
+API REST de turnos y reservas organizada en routers, controllers y managers. Los routers definen las URLs, los controllers procesan las solicitudes y respuestas, y los managers concentran la lógica y la persistencia en archivos JSON.
 
-## Qué incluye
+## Requisitos
 
-- Proyecto con sintaxis ESM
-- Variables de entorno con dotenv
-- Clase para gestionar servicios de reservas y turnos
-- Datos iniciales en memoria
+- Node.js 20 o superior
+- npm
 
-## Instalación
+## Instalación y ejecución
 
 ```bash
 npm install
+npm start
 ```
 
-## Variables de entorno
-
-Crear un archivo `.env` con:
+Crear previamente un archivo `.env` a partir de `.env.example`:
 
 ```env
 PORT=8080
 NODE_ENV=development
 ```
 
-## Ejecución
+Para ejecutar las pruebas automatizadas:
 
 ```bash
-npm start
+npm test
 ```
 
 ## Endpoints de servicios
 
-- `GET /api/services` - lista todos los servicios
-- `GET /api/services/:sid` - obtiene un servicio por id
-- `POST /api/services` - crea un servicio nuevo
-- `PUT /api/services/:sid` - actualiza un servicio existente
-- `DELETE /api/services/:sid` - elimina un servicio
+| Método | URL | Descripción |
+| --- | --- | --- |
+| GET | `/api/services` | Lista los servicios |
+| GET | `/api/services/:sid` | Obtiene un servicio por ID |
+| POST | `/api/services` | Crea un servicio |
+| PUT | `/api/services/:sid` | Actualiza un servicio |
+| DELETE | `/api/services/:sid` | Elimina un servicio |
 
-Ejemplo de petición `POST /services`:
-
-```json
-{
-  "name": "Masaje relajante",
-  "description": "Masaje para reducir estrés",
-  "duration": 45,
-  "price": 3000,
-  "category": "bienestar",
-  "available": true
-}
-```
-
-## Persistencia
-
-Los servicios se guardan en `src/data/services.json`. El `ServiceManager` carga los datos desde ese archivo y mantiene la información cuando se crean, actualizan o eliminan servicios.
+El listado admite los filtros opcionales `category` y `available`.
 
 ## Endpoints de reservas
 
-- `GET /api/bookings` - lista todas las reservas
-- `POST /api/bookings` - crea una reserva con su arreglo de servicios vacío
-- `GET /api/bookings/:bid` - obtiene una reserva por id
-- `POST /api/bookings/:bid/services/:sid` - agrega un servicio a la reserva
+| Método | URL | Descripción |
+| --- | --- | --- |
+| GET | `/api/bookings` | Lista las reservas |
+| POST | `/api/bookings` | Crea una reserva |
+| GET | `/api/bookings/:bid` | Obtiene una reserva por ID |
+| POST | `/api/bookings/:bid/services/:sid` | Agrega un servicio a una reserva |
 
-Las reservas se guardan en `src/data/bookings.json`. Si se agrega nuevamente el
-mismo servicio, se incrementa su propiedad `quantity`.
+Una reserva nueva inicia con `services` vacío. Si se agrega dos veces el mismo servicio, se incrementa su cantidad.
 
-Ejemplo de petición `POST /api/bookings`:
+## Persistencia y arquitectura
 
-```json
-{
-  "clientName": "Ana Pérez",
-  "clientEmail": "ana@example.com",
-  "date": "2026-08-10",
-  "time": "18:30",
-  "status": "PENDIENTE",
-  "services": []
-}
-```
+- `src/routes`: declara endpoints y los conecta con controllers.
+- `src/controllers`: lee `params`, `query` y `body`, delega al manager y genera respuestas HTTP.
+- `src/managers`: valida y administra los datos sin depender de `req` ni `res`.
+- `src/data`: almacena servicios y reservas en archivos JSON.
 
-## Formato de un servicio
-
-```json
-{
-  "id": 1,
-  "name": "Reserva de mesa",
-  "description": "Reserva para un turno en el restaurante",
-  "duration": 60,
-  "price": 0,
-  "category": "reservas",
-  "available": true
-}
-```
-
-## Ejemplo de uso
-
-```js
-import BookingServiceManager from './src/managers/ServiceManager.js';
-
-const manager = new BookingServiceManager();
-console.log(manager.getServices());
-```
+Todas las respuestas usan `status` con los valores `success` o `error`, más `data` o `message` según corresponda. En [requests.http](./requests.http) hay ejemplos listos para probar las rutas.

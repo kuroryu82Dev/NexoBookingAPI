@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:8080
+
+### Listar servicios
+GET {{baseUrl}}/api/services
+
+### Obtener un servicio por ID
+GET {{baseUrl}}/api/services/1
+
+### Listar reservas
+GET {{baseUrl}}/api/bookings
+
+### Obtener una reserva por ID
+GET {{baseUrl}}/api/bookings/1

@@ -98,8 +98,13 @@ class BookingManager {
     return booking;
   }
 
-  getBookings() {
+  getAll() {
     return [...this.bookings];
+  }
+
+  // Mantiene compatibilidad con consumidores anteriores del manager.
+  getBookings() {
+    return this.getAll();
   }
 
   getBookingById(id) {
