@@ -5,14 +5,24 @@ import { servicesRepository, bookingsRepository } from '../src/config/layer.inst
 
 async function withServer(run) {
   const server = app.listen(0, '127.0.0.1');
-  await new Promise((resolve, reject) => { server.once('listening', resolve); server.once('error', reject); });
-  try { await run(`http://127.0.0.1:${server.address().port}`); }
-  finally { await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve())); }
+  await new Promise((resolve, reject) => {
+    server.once('listening', resolve);
+    server.once('error', reject);
+  });
+  try {
+    await run(`http://127.0.0.1:${server.address().port}`);
+  } finally {
+    await new Promise((resolve, reject) =>
+      server.close((error) => (error ? reject(error) : resolve()))
+    );
+  }
 }
 
 test('GET /api/services/:sid conserva la URL pública', async (t) => {
   const original = servicesRepository.dao.getById;
-  t.after(() => { servicesRepository.dao.getById = original; });
+  t.after(() => {
+    servicesRepository.dao.getById = original;
+  });
   const id = '64b000000000000000000001';
   servicesRepository.dao.getById = async () => ({ _id: id, name: 'Reserva' });
   await withServer(async (baseUrl) => {
@@ -24,7 +34,9 @@ test('GET /api/services/:sid conserva la URL pública', async (t) => {
 
 test('GET /api/bookings lista las reservas', async (t) => {
   const original = bookingsRepository.dao.getAll;
-  t.after(() => { bookingsRepository.dao.getAll = original; });
+  t.after(() => {
+    bookingsRepository.dao.getAll = original;
+  });
   bookingsRepository.dao.getAll = async () => [];
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/bookings`);

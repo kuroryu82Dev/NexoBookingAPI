@@ -60,7 +60,10 @@ test('addServiceToBooking validates that booking and service exist', () => {
   const booking = bookingManager.createBooking(validBooking());
 
   assert.throws(() => bookingManager.addServiceToBooking(999, 1), /Reserva no encontrada/);
-  assert.throws(() => bookingManager.addServiceToBooking(booking.id, 999), /Servicio no encontrado/);
+  assert.throws(
+    () => bookingManager.addServiceToBooking(booking.id, 999),
+    /Servicio no encontrado/
+  );
 });
 
 test('createBooking validates fields and prevents receiving an id', () => {

@@ -1,0 +1,26 @@
+<section class='hero'>
+  <p class='eyebrow'>Agenda actualizada</p>
+  <h1>Reservas y disponibilidad</h1>
+  <p>Los cambios realizados desde la API aparecen aquí automáticamente.</p>
+</section>
+
+<section>
+  <h2>Próximas reservas</h2>
+  <div class='grid' id='bookings-list'>
+    {{#each bookings}}
+      <article class='card'>
+        <div class='card-heading'><span class='category'>{{status}}</span></div>
+        <h3>{{clientName}}</h3><p>{{clientEmail}}</p>
+        <dl><div><dt>Fecha</dt><dd>{{date}}</dd></div><div><dt>Hora</dt><dd>{{time}}</dd></div></dl>
+      </article>
+    {{else}}<p class='empty'>No hay reservas registradas.</p>{{/each}}
+  </div>
+</section>
+
+<section>
+  <h2>Servicios disponibles</h2>
+  <ul class='service-summary' id='available-services'>
+    {{#each services}}<li><strong>{{name}}</strong><span>{{duration}}
+          min · ${{price}}</span></li>{{else}}<li>No hay servicios disponibles.</li>{{/each}}
+  </ul>
+</section>

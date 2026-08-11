@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [
     "node",
@@ -19,9 +21,17 @@
   ],
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
   "dependencies": {
     "dotenv": "^16.6.1",
     "express": "^5.2.1",
-    "mongoose": "^9.8.1"
+    "express-handlebars": "^9.0.1",
+    "mongoose": "^9.8.1",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6"
   }
 }

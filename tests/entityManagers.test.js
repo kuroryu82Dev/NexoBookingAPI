@@ -59,11 +59,14 @@ test('MesasManager evita mesas reservadas en la misma fecha y hora', () => {
     }
   ];
 
-  const mesa = manager.findBestMesaForRequest({
-    personas: 4,
-    fecha: '2026-07-10',
-    hora: '20:30'
-  }, reservas);
+  const mesa = manager.findBestMesaForRequest(
+    {
+      personas: 4,
+      fecha: '2026-07-10',
+      hora: '20:30'
+    },
+    reservas
+  );
 
   assert.equal(mesa.id, 'mesa-2');
 });
@@ -73,12 +76,15 @@ test('ReservasManager confirma y cancela reservas', () => {
   const manager = new ReservasManager(tempFile);
   const mesa = { id: 'mesa-test', capacidad: 4 };
 
-  const reserva = manager.createReserva({
-    clienteId: 'cli-test',
-    fecha: '2026-07-10',
-    hora: '20:30',
-    personas: 4
-  }, mesa);
+  const reserva = manager.createReserva(
+    {
+      clienteId: 'cli-test',
+      fecha: '2026-07-10',
+      hora: '20:30',
+      personas: 4
+    },
+    mesa
+  );
 
   assert.equal(reserva.estado, 'PENDIENTE');
   assert.equal(manager.confirmarReserva(reserva.id).estado, 'CONFIRMADA');
