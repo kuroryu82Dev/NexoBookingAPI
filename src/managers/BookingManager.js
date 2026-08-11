@@ -61,7 +61,10 @@ class BookingManager {
       throw new Error('El campo clientEmail no es válido');
     }
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date) || Number.isNaN(Date.parse(`${data.date}T00:00:00`))) {
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(data.date) ||
+      Number.isNaN(Date.parse(`${data.date}T00:00:00`))
+    ) {
       throw new Error('El campo date debe tener el formato YYYY-MM-DD');
     }
 
@@ -69,7 +72,10 @@ class BookingManager {
       throw new Error('El campo time debe tener el formato HH:mm');
     }
 
-    if (data.services !== undefined && (!Array.isArray(data.services) || data.services.length > 0)) {
+    if (
+      data.services !== undefined &&
+      (!Array.isArray(data.services) || data.services.length > 0)
+    ) {
       throw new Error('Una reserva nueva debe iniciar con services vacío');
     }
   }

@@ -46,16 +46,26 @@ En una reserva, cada servicio se almacena como `{ service: ObjectId, quantity: N
 
 ## Endpoints
 
-| Método | URL | Descripción |
-| --- | --- | --- |
-| GET | `/api/services` | Lista servicios; acepta `category` y `available` |
-| GET | `/api/services/:sid` | Obtiene un servicio |
-| POST | `/api/services` | Crea un servicio |
-| PUT | `/api/services/:sid` | Actualiza un servicio |
-| DELETE | `/api/services/:sid` | Elimina un servicio |
-| GET | `/api/bookings` | Lista reservas |
-| POST | `/api/bookings` | Crea una reserva |
-| GET | `/api/bookings/:bid` | Obtiene una reserva |
-| POST | `/api/bookings/:bid/services/:sid` | Agrega un servicio a una reserva |
+| Método | URL                                | Descripción                                      |
+| ------ | ---------------------------------- | ------------------------------------------------ |
+| GET    | `/api/services`                    | Lista servicios; acepta `category` y `available` |
+| GET    | `/api/services/:sid`               | Obtiene un servicio                              |
+| POST   | `/api/services`                    | Crea un servicio                                 |
+| PUT    | `/api/services/:sid`               | Actualiza un servicio                            |
+| DELETE | `/api/services/:sid`               | Elimina un servicio                              |
+| GET    | `/api/bookings`                    | Lista reservas                                   |
+| POST   | `/api/bookings`                    | Crea una reserva                                 |
+| GET    | `/api/bookings/:bid`               | Obtiene una reserva                              |
+| POST   | `/api/bookings/:bid/services/:sid` | Agrega un servicio a una reserva                 |
+
+## Vistas y tiempo real
+
+- `GET /views/services`: catálogo renderizado con Handlebars desde MongoDB.
+- `GET /views/availability`: reservas y servicios disponibles desde MongoDB.
+
+Express y Socket.io comparten el mismo servidor HTTP. Los cambios exitosos en
+servicios emiten `services:changed`; crear una reserva o agregarle un servicio
+emite `bookings:changed`. El navegador consulta la API REST y actualiza solamente
+el contenido afectado, sin recargar la página.
 
 Los parámetros `:sid` y `:bid` son IDs de MongoDB. Las respuestas mantienen el formato `{ status: 'success', data }` o `{ status: 'error', message }`.

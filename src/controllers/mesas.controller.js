@@ -1,4 +1,10 @@
-import { listarMesas, findBestMesaForRequest, crearMesa, actualizarMesa, eliminarMesa } from '../services/mesas.service.js';
+import {
+  listarMesas,
+  findBestMesaForRequest,
+  crearMesa,
+  actualizarMesa,
+  eliminarMesa
+} from '../services/mesas.service.js';
 import { listarReservas } from '../services/reservas.service.js';
 
 export function listarMesasController(req, res) {

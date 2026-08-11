@@ -1,0 +1,28 @@
+<section class='hero'>
+  <p class='eyebrow'>Catálogo en tiempo real</p>
+  <h1>Servicios</h1>
+  <p>Consulta los servicios registrados en Nexo Booking.</p>
+</section>
+
+<section class='grid' id='services-list'>
+  {{#each services}}
+    <article class='card'>
+      <div class='card-heading'>
+        <span class='category'>{{category}}</span>
+        {{#if available}}
+          <span class='availability'>Disponible</span>
+        {{else}}
+          <span class='availability unavailable'>No disponible</span>
+        {{/if}}
+      </div>
+      <h2>{{name}}</h2>
+      <p>{{description}}</p>
+      <dl>
+        <div><dt>Duración</dt><dd>{{duration}} min</dd></div>
+        <div><dt>Precio</dt><dd>${{price}}</dd></div>
+      </dl>
+    </article>
+  {{else}}
+    <p class='empty'>Todavía no hay servicios registrados.</p>
+  {{/each}}
+</section>
