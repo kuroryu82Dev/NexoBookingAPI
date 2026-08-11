@@ -1,60 +1,53 @@
 # Nexo Booking API
 
-API REST de turnos y reservas organizada en routers, controllers y managers. Los routers definen las URLs, los controllers procesan las solicitudes y respuestas, y los managers concentran la lógica y la persistencia en archivos JSON.
+API REST para gestionar servicios y reservas, persistida en archivos JSON y organizada con arquitectura en capas.
 
-## Requisitos
+## Requisitos y ejecución
 
 - Node.js 20 o superior
 - npm
 
-## Instalación y ejecución
-
 ```bash
 npm install
+copy .env.example .env
 npm start
 ```
 
-Crear previamente un archivo `.env` a partir de `.env.example`:
+Durante el desarrollo puede usarse `npm run dev`. Las pruebas se ejecutan con `npm test`.
 
-```env
-PORT=8080
-NODE_ENV=development
+## Arquitectura
+
+Cada petición recorre el siguiente flujo:
+
+```text
+Router → Controller → Service → Repository → DAO → archivo JSON
 ```
 
-Para ejecutar las pruebas automatizadas:
+- `routes`: define las URLs y conecta cada endpoint con un controller.
+- `controllers`: interpreta `req`, delega el caso de uso y construye `res`.
+- `services`: contiene validaciones y reglas de negocio, sin conocer HTTP ni archivos.
+- `repositories`: ofrece una interfaz de acceso a datos y desacopla el negocio de la persistencia.
+- `dao`: lee y escribe directamente los archivos de `src/data`, sin reglas de negocio.
+- `config/layer.instances.js`: compone las dependencias de las capas.
 
-```bash
-npm test
-```
+Esta separación permite reemplazar los DAO de JSON por implementaciones de MongoDB/Mongoose sin modificar controllers ni reglas de negocio. La regla que incrementa `quantity` cuando un servicio ya existe en una reserva está implementada exclusivamente en `bookings.service.js`.
 
-## Endpoints de servicios
+## Endpoints
 
 | Método | URL | Descripción |
 | --- | --- | --- |
-| GET | `/api/services` | Lista los servicios |
-| GET | `/api/services/:sid` | Obtiene un servicio por ID |
+| GET | `/api/services` | Lista servicios; acepta `category` y `available` |
+| GET | `/api/services/:sid` | Obtiene un servicio |
 | POST | `/api/services` | Crea un servicio |
 | PUT | `/api/services/:sid` | Actualiza un servicio |
 | DELETE | `/api/services/:sid` | Elimina un servicio |
-
-El listado admite los filtros opcionales `category` y `available`.
-
-## Endpoints de reservas
-
-| Método | URL | Descripción |
-| --- | --- | --- |
-| GET | `/api/bookings` | Lista las reservas |
+| GET | `/api/bookings` | Lista reservas (compatibilidad con la API existente) |
 | POST | `/api/bookings` | Crea una reserva |
-| GET | `/api/bookings/:bid` | Obtiene una reserva por ID |
+| GET | `/api/bookings/:bid` | Obtiene una reserva |
 | POST | `/api/bookings/:bid/services/:sid` | Agrega un servicio a una reserva |
 
-Una reserva nueva inicia con `services` vacío. Si se agrega dos veces el mismo servicio, se incrementa su cantidad.
+Las respuestas conservan el formato `{ status: 'success', data }` o `{ status: 'error', message }`. En `requests.http` hay ejemplos para probar la API.
 
-## Persistencia y arquitectura
+## Variables de entorno
 
-- `src/routes`: declara endpoints y los conecta con controllers.
-- `src/controllers`: lee `params`, `query` y `body`, delega al manager y genera respuestas HTTP.
-- `src/managers`: valida y administra los datos sin depender de `req` ni `res`.
-- `src/data`: almacena servicios y reservas en archivos JSON.
-
-Todas las respuestas usan `status` con los valores `success` o `error`, más `data` o `message` según corresponda. En [requests.http](./requests.http) hay ejemplos listos para probar las rutas.
+Copiar `.env.example` como `.env`. Nunca debe versionarse `.env`, credenciales reales ni `node_modules`.
