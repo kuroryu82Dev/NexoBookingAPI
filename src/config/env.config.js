@@ -12,5 +12,6 @@ for (const envVar of requiredEnvVars) {
 
 export const env = {
     PORT: Number(process.env.PORT),
-    NODE_ENV: process.env.NODE_ENV
+    NODE_ENV: process.env.NODE_ENV,
+    MONGO_URI: process.env.MONGO_URI
 };

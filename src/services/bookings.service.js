@@ -7,9 +7,7 @@ function notFound(message) {
 function validate(data) {
   if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Los datos de la reserva deben ser un objeto');
   const allowed = ['clientName', 'clientEmail', 'date', 'time', 'status', 'services'];
-  for (const key of Object.keys(data)) {
-    if (!allowed.includes(key)) throw new Error(`Propiedad inválida de la reserva: ${key}`);
-  }
+  for (const key of Object.keys(data)) if (!allowed.includes(key)) throw new Error(`Propiedad inválida de la reserva: ${key}`);
   for (const field of ['clientName', 'clientEmail', 'date', 'time', 'status']) {
     if (typeof data[field] !== 'string' || !data[field].trim()) throw new Error(`El campo ${field} es obligatorio`);
   }
@@ -44,16 +42,15 @@ export class BookingsService {
   getBookings() { return this.bookingsRepository.getAll(); }
   getBookingById(id) { return this.bookingsRepository.getById(id); }
 
-  addServiceToBooking(bookingId, serviceId) {
-    const booking = this.bookingsRepository.getById(bookingId);
+  async addServiceToBooking(bookingId, serviceId) {
+    const booking = await this.bookingsRepository.getById(bookingId);
     if (!booking) throw notFound('Reserva no encontrada');
-    if (!this.servicesRepository.getById(serviceId)) throw notFound('Servicio no encontrado');
+    if (!await this.servicesRepository.getById(serviceId)) throw notFound('Servicio no encontrado');
 
     const services = booking.services.map((item) => ({ ...item }));
-    const item = services.find((entry) => entry.service === serviceId);
+    const item = services.find((entry) => entry.service.toString() === serviceId);
     if (item) item.quantity += 1;
     else services.push({ service: serviceId, quantity: 1 });
-
     return this.bookingsRepository.update(bookingId, { services });
   }
 }

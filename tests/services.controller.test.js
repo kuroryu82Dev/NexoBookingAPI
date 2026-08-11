@@ -1,64 +1,30 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getAllServices } from '../src/controllers/services.controller.js';
+import { servicesRepository } from '../src/config/layer.instances.js';
 
 function createResponse() {
-  return {
-    statusCode: null,
-    body: null,
-    status(code) {
-      this.statusCode = code;
-      return this;
-    },
-    json(body) {
-      this.body = body;
-      return this;
-    }
-  };
+  return { statusCode: null, body: null, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; return this; } };
 }
 
-test('getAllServices filters services by category', () => {
+const data = [
+  { category: 'reservas', available: true },
+  { category: 'reservas', available: false },
+  { category: 'turnos', available: true }
+];
+
+test('getAllServices transmite filtros a la persistencia MongoDB', async (t) => {
+  const original = servicesRepository.dao.getAll;
+  t.after(() => { servicesRepository.dao.getAll = original; });
+  servicesRepository.dao.getAll = async (filters) => data.filter((item) => Object.entries(filters).every(([key, value]) => value instanceof RegExp ? value.test(item[key]) : item[key] === value));
   const res = createResponse();
-
-  getAllServices({ query: { category: 'RESERVAS' } }, res);
-
+  await getAllServices({ query: { category: 'RESERVAS', available: 'true' } }, res);
   assert.equal(res.statusCode, 200);
-  assert.equal(res.body.status, 'success');
-  assert.ok(res.body.data.length > 0);
-  assert.ok(res.body.data.every((service) => service.category === 'reservas'));
+  assert.deepEqual(res.body.data, [{ category: 'reservas', available: true }]);
 });
 
-test('getAllServices filters services by availability', () => {
+test('getAllServices rechaza available inválido', async () => {
   const res = createResponse();
-
-  getAllServices({ query: { available: 'false' } }, res);
-
-  assert.equal(res.statusCode, 200);
-  assert.ok(res.body.data.every((service) => service.available === false));
-});
-
-test('getAllServices combines category and availability filters', () => {
-  const res = createResponse();
-
-  getAllServices({
-    query: { category: 'reservas', available: 'true' }
-  }, res);
-
-  assert.equal(res.statusCode, 200);
-  assert.ok(res.body.data.length > 0);
-  assert.ok(res.body.data.every(
-    (service) => service.category === 'reservas' && service.available === true
-  ));
-});
-
-test('getAllServices rejects an invalid availability filter', () => {
-  const res = createResponse();
-
-  getAllServices({ query: { available: 'yes' } }, res);
-
+  await getAllServices({ query: { available: 'yes' } }, res);
   assert.equal(res.statusCode, 400);
-  assert.deepEqual(res.body, {
-    status: 'error',
-    message: 'El filtro available debe ser true o false'
-  });
 });

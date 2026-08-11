@@ -1,10 +1,11 @@
 # Nexo Booking API
 
-API REST para gestionar servicios y reservas, persistida en archivos JSON y organizada con arquitectura en capas.
+API REST para gestionar servicios y reservas con MongoDB Atlas, Mongoose y una arquitectura en capas.
 
 ## Requisitos y ejecución
 
 - Node.js 20 o superior
+- MongoDB Atlas (o una instancia compatible de MongoDB)
 - npm
 
 ```bash
@@ -13,24 +14,35 @@ copy .env.example .env
 npm start
 ```
 
-Durante el desarrollo puede usarse `npm run dev`. Las pruebas se ejecutan con `npm test`.
+Configura `MONGO_URI` en tu `.env` antes de iniciar. Para desarrollo puede usarse `npm run dev` y para ejecutar las pruebas, `npm test`.
+
+## Variables de entorno
+
+```env
+PORT=8080
+NODE_ENV=development
+MONGO_URI=mongodb+srv://<usuario>:<password>@<cluster>/<database>?retryWrites=true&w=majority
+```
+
+El archivo `.env` y `node_modules` están ignorados por Git. Nunca deben subirse credenciales reales al repositorio.
 
 ## Arquitectura
 
-Cada petición recorre el siguiente flujo:
+Cada petición recorre este flujo:
 
 ```text
-Router → Controller → Service → Repository → DAO → archivo JSON
+Router → Controller → Service → Repository → DAO → Mongoose → MongoDB
 ```
 
-- `routes`: define las URLs y conecta cada endpoint con un controller.
-- `controllers`: interpreta `req`, delega el caso de uso y construye `res`.
-- `services`: contiene validaciones y reglas de negocio, sin conocer HTTP ni archivos.
-- `repositories`: ofrece una interfaz de acceso a datos y desacopla el negocio de la persistencia.
-- `dao`: lee y escribe directamente los archivos de `src/data`, sin reglas de negocio.
-- `config/layer.instances.js`: compone las dependencias de las capas.
+- `routes`: define las URLs.
+- `controllers`: interpreta HTTP y construye la respuesta.
+- `services`: contiene validaciones y reglas de negocio.
+- `repositories`: desacopla la lógica de negocio de la persistencia.
+- `dao`: consulta los modelos Mongoose.
+- `models`: define las colecciones `services`, `bookings` y `messages`.
+- `config/database.js`: administra la conexión con MongoDB.
 
-Esta separación permite reemplazar los DAO de JSON por implementaciones de MongoDB/Mongoose sin modificar controllers ni reglas de negocio. La regla que incrementa `quantity` cuando un servicio ya existe en una reserva está implementada exclusivamente en `bookings.service.js`.
+En una reserva, cada servicio se almacena como `{ service: ObjectId, quantity: Number }`; no se duplica el objeto completo. Si se agrega el mismo servicio nuevamente, se incrementa su cantidad.
 
 ## Endpoints
 
@@ -41,13 +53,9 @@ Esta separación permite reemplazar los DAO de JSON por implementaciones de Mong
 | POST | `/api/services` | Crea un servicio |
 | PUT | `/api/services/:sid` | Actualiza un servicio |
 | DELETE | `/api/services/:sid` | Elimina un servicio |
-| GET | `/api/bookings` | Lista reservas (compatibilidad con la API existente) |
+| GET | `/api/bookings` | Lista reservas |
 | POST | `/api/bookings` | Crea una reserva |
 | GET | `/api/bookings/:bid` | Obtiene una reserva |
 | POST | `/api/bookings/:bid/services/:sid` | Agrega un servicio a una reserva |
 
-Las respuestas conservan el formato `{ status: 'success', data }` o `{ status: 'error', message }`. En `requests.http` hay ejemplos para probar la API.
-
-## Variables de entorno
-
-Copiar `.env.example` como `.env`. Nunca debe versionarse `.env`, credenciales reales ni `node_modules`.
+Los parámetros `:sid` y `:bid` son IDs de MongoDB. Las respuestas mantienen el formato `{ status: 'success', data }` o `{ status: 'error', message }`.
