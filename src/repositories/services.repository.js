@@ -3,7 +3,7 @@ export class ServicesRepository {
     this.dao = dao;
   }
 
-  getAll() { return this.dao.getAll(); }
+  getAll(filters) { return this.dao.getAll(filters); }
   getById(id) { return this.dao.getById(id); }
   create(data) { return this.dao.create(data); }
   update(id, data) { return this.dao.update(id, data); }

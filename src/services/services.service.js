@@ -1,16 +1,11 @@
 const allowedKeys = ['name', 'description', 'duration', 'price', 'category', 'available'];
 
 function validate(data, partial = false) {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new Error('Los datos del servicio deben ser un objeto');
-  }
+  if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Los datos del servicio deben ser un objeto');
   const keys = Object.keys(data);
   if (!keys.length) throw new Error('No hay datos válidos para procesar');
-  for (const key of keys) {
-    if (!allowedKeys.includes(key)) throw new Error(`Propiedad inválida del servicio: ${key}`);
-  }
-  const textFields = ['name', 'description', 'category'];
-  for (const field of textFields) {
+  for (const key of keys) if (!allowedKeys.includes(key)) throw new Error(`Propiedad inválida del servicio: ${key}`);
+  for (const field of ['name', 'description', 'category']) {
     if ((!partial || field in data) && (typeof data[field] !== 'string' || !data[field].trim())) {
       throw new Error(`El campo ${field} es obligatorio y debe ser una cadena no vacía`);
     }
@@ -27,27 +22,21 @@ function validate(data, partial = false) {
 }
 
 function normalize(data) {
-  return Object.fromEntries(Object.entries(data).map(([key, value]) => [
-    key,
-    typeof value === 'string' ? value.trim() : value
-  ]));
+  return Object.fromEntries(Object.entries(data).map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value]));
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 export class ServicesService {
   constructor(repository) { this.repository = repository; }
-
   getServices(filters = {}) {
-    let services = this.repository.getAll();
-    if (filters.category !== undefined) {
-      const category = filters.category.trim().toLowerCase();
-      services = services.filter((service) => service.category.toLowerCase() === category);
-    }
-    if (filters.available !== undefined) {
-      services = services.filter((service) => service.available === filters.available);
-    }
-    return services;
+    const query = {};
+    if (filters.category !== undefined) query.category = new RegExp(`^${escapeRegExp(filters.category.trim())}$`, 'i');
+    if (filters.available !== undefined) query.available = filters.available;
+    return this.repository.getAll(query);
   }
-
   getServiceById(id) { return this.repository.getById(id); }
   createService(data) { validate(data); return this.repository.create(normalize(data)); }
   updateService(id, data) { validate(data, true); return this.repository.update(id, normalize(data)); }

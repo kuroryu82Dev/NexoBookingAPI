@@ -4,10 +4,10 @@
 GET {{baseUrl}}/api/services
 
 ### Obtener un servicio por ID
-GET {{baseUrl}}/api/services/1
+GET {{baseUrl}}/api/services/64b000000000000000000001
 
 ### Listar reservas
 GET {{baseUrl}}/api/bookings
 
 ### Obtener una reserva por ID
-GET {{baseUrl}}/api/bookings/1
+GET {{baseUrl}}/api/bookings/64b000000000000000000002
