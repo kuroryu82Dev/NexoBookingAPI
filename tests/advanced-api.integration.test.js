@@ -110,3 +110,27 @@ test('Zod valida los ObjectId al agregar un servicio a una reserva', async () =>
     assert.match((await response.json()).message, /ObjectId/);
   });
 });
+
+test('Zod rechaza cantidades inválidas antes de actualizar una reserva', async (t) => {
+  const original = bookingsRepository.dao.update;
+  t.after(() => {
+    bookingsRepository.dao.update = original;
+  });
+  let daoCalled = false;
+  bookingsRepository.dao.update = async () => {
+    daoCalled = true;
+  };
+  const bid = '64b000000000000000000001';
+  const sid = '64b000000000000000000002';
+
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/bookings/${bid}/services/${sid}`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ quantity: 0 })
+    });
+    assert.equal(response.status, 400);
+    assert.match((await response.json()).message, /quantity/);
+    assert.equal(daoCalled, false);
+  });
+});

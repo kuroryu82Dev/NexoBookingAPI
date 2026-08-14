@@ -56,3 +56,40 @@ export async function addServiceToBooking(req, res) {
     return jsonError(res, error.statusCode ?? 400, error.message);
   }
 }
+
+async function runBookingMutation(req, res, action, eventAction) {
+  const params = req.validatedParams ?? req.params;
+  try {
+    const data = await action(params);
+    emitDomainEvent('bookings:changed', { action: eventAction, id: data._id });
+    return res.status(200).json({ status: 'success', data });
+  } catch (error) {
+    return jsonError(res, error.statusCode ?? 400, error.message);
+  }
+}
+
+export function updateBookingService(req, res) {
+  return runBookingMutation(
+    req,
+    res,
+    ({ bid, sid }) => bookingsService.updateServiceQuantity(bid, sid, req.validatedBody.quantity),
+    'service-quantity-updated'
+  );
+}
+
+export function removeBookingService(req, res) {
+  return runBookingMutation(
+    req,
+    res,
+    ({ bid, sid }) => bookingsService.removeServiceFromBooking(bid, sid),
+    'service-removed'
+  );
+}
+
+export function clearBooking(req, res) {
+  return runBookingMutation(req, res, ({ bid }) => bookingsService.clearBooking(bid), 'cleared');
+}
+
+export function deleteBooking(req, res) {
+  return runBookingMutation(req, res, ({ bid }) => bookingsService.deleteBooking(bid), 'deleted');
+}

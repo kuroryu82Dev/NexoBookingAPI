@@ -34,6 +34,12 @@ export const createBookingSchema = z
 
 export const addServiceToBookingSchema = z.object({ bid: objectId, sid: objectId });
 
+export const bookingIdSchema = z.object({ bid: objectId });
+
+export const updateBookingServiceSchema = z
+  .object({ quantity: z.number().int().positive('quantity debe ser un entero mayor a 0') })
+  .strict();
+
 export const servicesQuerySchema = z
   .object({
     category: z.string().trim().min(1, 'category no puede estar vacío').optional(),

@@ -18,6 +18,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/views', viewsRouter);
+app.use('/', viewsRouter);
 app.use('/api/services', servicesRouter);
 app.use('/api/bookings', bookingsRouter);
 app.use('/clientes', clientesRoutes);

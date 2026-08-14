@@ -47,6 +47,25 @@ test('GET /views/services renderiza datos de la capa de servicios', async (t) =>
   });
 });
 
+test('las rutas públicas de servicios y tiempo real renderizan la vista', async (t) => {
+  const originalGetAll = servicesRepository.dao.getAll;
+  const originalCount = servicesRepository.dao.count;
+  t.after(() => {
+    servicesRepository.dao.getAll = originalGetAll;
+    servicesRepository.dao.count = originalCount;
+  });
+  servicesRepository.dao.getAll = async () => [];
+  servicesRepository.dao.count = async () => 0;
+
+  await withServer(async (baseUrl) => {
+    for (const route of ['/services', '/realtime-services']) {
+      const response = await fetch(`${baseUrl}${route}`);
+      assert.equal(response.status, 200);
+      assert.match(await response.text(), /Nexo Booking/);
+    }
+  });
+});
+
 test('GET /views/availability renderiza reservas y servicios disponibles', async (t) => {
   const originalServices = servicesRepository.dao.getAll;
   const originalCount = servicesRepository.dao.count;

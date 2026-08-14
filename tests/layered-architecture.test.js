@@ -97,6 +97,37 @@ test('bookings incrementa quantity usando una referencia ObjectId', async () => 
   assert.equal(updated.services[0].quantity, 2);
 });
 
+test('bookings permite actualizar cantidad, quitar servicios, vaciar y eliminar', async () => {
+  const { servicesService, bookingsService } = createLayers();
+  const firstService = await servicesService.createService(serviceData);
+  const secondService = await servicesService.createService({
+    ...serviceData,
+    name: 'Cena especial'
+  });
+  const booking = await bookingsService.createBooking(bookingData);
+  const bid = booking._id.toString();
+
+  await bookingsService.addServiceToBooking(bid, firstService._id.toString());
+  await bookingsService.addServiceToBooking(bid, secondService._id.toString());
+  const withQuantity = await bookingsService.updateServiceQuantity(
+    bid,
+    firstService._id.toString(),
+    3
+  );
+  assert.equal(withQuantity.services[0].quantity, 3);
+
+  const withoutFirst = await bookingsService.removeServiceFromBooking(
+    bid,
+    firstService._id.toString()
+  );
+  assert.equal(withoutFirst.services.length, 1);
+
+  const empty = await bookingsService.clearBooking(bid);
+  assert.deepEqual(empty.services, []);
+  assert.equal((await bookingsService.deleteBooking(bid))._id.toString(), bid);
+  assert.equal(await bookingsService.getBookingById(bid), null);
+});
+
 test('el schema de booking referencia Service con ObjectId', () => {
   const path = BookingModel.schema.path('services').schema.path('service');
   assert.equal(path.instance, 'ObjectId');

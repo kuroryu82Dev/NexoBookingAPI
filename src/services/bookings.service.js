@@ -63,6 +63,37 @@ export class BookingsService {
     else services.push({ service: serviceId, quantity: 1 });
     return this.bookingsRepository.update(bookingId, { services });
   }
+
+  async updateServiceQuantity(bookingId, serviceId, quantity) {
+    const booking = await this.bookingsRepository.getByIdRaw(bookingId);
+    if (!booking) throw notFound('Reserva no encontrada');
+    const services = booking.services.map((item) => ({ ...item }));
+    const item = services.find((entry) => entry.service.toString() === serviceId);
+    if (!item) throw notFound('El servicio no está asociado a la reserva');
+    item.quantity = quantity;
+    return this.bookingsRepository.update(bookingId, { services });
+  }
+
+  async removeServiceFromBooking(bookingId, serviceId) {
+    const booking = await this.bookingsRepository.getByIdRaw(bookingId);
+    if (!booking) throw notFound('Reserva no encontrada');
+    const services = booking.services.filter((entry) => entry.service.toString() !== serviceId);
+    if (services.length === booking.services.length)
+      throw notFound('El servicio no está asociado a la reserva');
+    return this.bookingsRepository.update(bookingId, { services });
+  }
+
+  async clearBooking(bookingId) {
+    if (!(await this.bookingsRepository.getByIdRaw(bookingId)))
+      throw notFound('Reserva no encontrada');
+    return this.bookingsRepository.update(bookingId, { services: [] });
+  }
+
+  async deleteBooking(bookingId) {
+    const booking = await this.bookingsRepository.delete(bookingId);
+    if (!booking) throw notFound('Reserva no encontrada');
+    return booking;
+  }
 }
 
 export default BookingsService;
