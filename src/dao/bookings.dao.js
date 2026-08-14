@@ -8,6 +8,9 @@ export class BookingsDao {
     return this.model.find().lean();
   }
   getById(id) {
+    return this.model.findById(id).populate('services.service').lean();
+  }
+  getByIdRaw(id) {
     return this.model.findById(id).lean();
   }
   create(data) {

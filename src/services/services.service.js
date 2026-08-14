@@ -47,8 +47,51 @@ export class ServicesService {
     const query = {};
     if (filters.category !== undefined)
       query.category = new RegExp(`^${escapeRegExp(filters.category.trim())}$`, 'i');
-    if (filters.available !== undefined) query.available = filters.available;
-    return this.repository.getAll(query);
+    if (filters.available !== undefined) {
+      if (typeof filters.available === 'boolean') query.available = filters.available;
+      else if (['true', 'false'].includes(filters.available))
+        query.available = filters.available === 'true';
+      else {
+        const error = new Error('available debe ser true o false');
+        error.statusCode = 400;
+        throw error;
+      }
+    }
+    const page = Number(filters.page ?? 1);
+    const limit = Number(filters.limit ?? 10);
+    const sortBy = filters.sortBy ?? 'createdAt';
+    const order = filters.order ?? 'asc';
+    const allowedSortFields = [
+      'name',
+      'category',
+      'duration',
+      'price',
+      'available',
+      'createdAt',
+      'updatedAt'
+    ];
+    if (!Number.isInteger(page) || page < 1 || !Number.isInteger(limit) || limit < 1 || limit > 100)
+      throw Object.assign(new Error('Paginación inválida'), { statusCode: 400 });
+    if (!allowedSortFields.includes(sortBy) || !['asc', 'desc'].includes(order))
+      throw Object.assign(new Error('Ordenamiento inválido'), { statusCode: 400 });
+
+    return Promise.all([
+      this.repository.getAll(query, { page, limit, sortBy, order }),
+      this.repository.count(query)
+    ]).then(([services, total]) => {
+      const totalPages = Math.ceil(total / limit);
+      return {
+        services,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages,
+          hasPrevPage: page > 1,
+          hasNextPage: page < totalPages
+        }
+      };
+    });
   }
   getServiceById(id) {
     return this.repository.getById(id);

@@ -9,6 +9,9 @@ export class BookingsRepository {
   getById(id) {
     return this.dao.getById(id);
   }
+  getByIdRaw(id) {
+    return this.dao.getByIdRaw(id);
+  }
   create(data) {
     return this.dao.create(data);
   }

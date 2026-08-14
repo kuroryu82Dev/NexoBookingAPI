@@ -35,7 +35,7 @@ function bookingCard(booking) {
 }
 
 async function updateServices() {
-  const services = await readApi('/api/services');
+  const services = await readApi('/api/services?limit=100');
   const list = document.querySelector('#services-list');
   if (list)
     list.innerHTML = services.length
@@ -46,11 +46,11 @@ async function updateServices() {
     const items = services.filter((service) => service.available);
     available.innerHTML = items.length
       ? items
-        .map(
-          (service) =>
-            `<li><strong>${escapeHtml(service.name)}</strong><span>${escapeHtml(service.duration)} min · $${escapeHtml(service.price)}</span></li>`
-        )
-        .join('')
+          .map(
+            (service) =>
+              `<li><strong>${escapeHtml(service.name)}</strong><span>${escapeHtml(service.duration)} min · $${escapeHtml(service.price)}</span></li>`
+          )
+          .join('')
       : '<li>No hay servicios disponibles.</li>';
   }
 }

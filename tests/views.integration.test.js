@@ -20,8 +20,10 @@ async function withServer(run) {
 
 test('GET /views/services renderiza datos de la capa de servicios', async (t) => {
   const original = servicesRepository.dao.getAll;
+  const originalCount = servicesRepository.dao.count;
   t.after(() => {
     servicesRepository.dao.getAll = original;
+    servicesRepository.dao.count = originalCount;
   });
   servicesRepository.dao.getAll = async () => [
     {
@@ -33,6 +35,7 @@ test('GET /views/services renderiza datos de la capa de servicios', async (t) =>
       available: true
     }
   ];
+  servicesRepository.dao.count = async () => 1;
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/views/services`);
     const html = await response.text();
@@ -46,9 +49,11 @@ test('GET /views/services renderiza datos de la capa de servicios', async (t) =>
 
 test('GET /views/availability renderiza reservas y servicios disponibles', async (t) => {
   const originalServices = servicesRepository.dao.getAll;
+  const originalCount = servicesRepository.dao.count;
   const originalBookings = bookingsRepository.dao.getAll;
   t.after(() => {
     servicesRepository.dao.getAll = originalServices;
+    servicesRepository.dao.count = originalCount;
     bookingsRepository.dao.getAll = originalBookings;
   });
   servicesRepository.dao.getAll = async () => [
@@ -61,6 +66,7 @@ test('GET /views/availability renderiza reservas y servicios disponibles', async
       available: true
     }
   ];
+  servicesRepository.dao.count = async () => 1;
   bookingsRepository.dao.getAll = async () => [
     {
       clientName: 'Cliente de prueba',

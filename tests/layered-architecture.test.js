@@ -11,15 +11,28 @@ class MemoryDao {
   constructor() {
     this.items = [];
   }
-  async getAll(filters = {}) {
-    return this.items.filter((item) =>
+  async getAll(filters = {}, options = {}) {
+    const matches = this.items.filter((item) =>
       Object.entries(filters).every(([key, value]) =>
         value instanceof RegExp ? value.test(item[key]) : item[key] === value
       )
     );
+    const { page = 1, limit = 10, sortBy = 'createdAt', order = 'asc' } = options;
+    return matches
+      .sort((left, right) => {
+        const result = String(left[sortBy] ?? '').localeCompare(String(right[sortBy] ?? ''));
+        return order === 'desc' ? -result : result;
+      })
+      .slice((page - 1) * limit, page * limit);
+  }
+  async count(filters = {}) {
+    return (await this.getAll(filters, { limit: Number.MAX_SAFE_INTEGER })).length;
   }
   async getById(id) {
     return this.items.find((item) => item._id.toString() === id.toString()) ?? null;
+  }
+  async getByIdRaw(id) {
+    return this.getById(id);
   }
   async create(data) {
     const item = { _id: new mongoose.Types.ObjectId(), ...data };

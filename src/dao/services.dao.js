@@ -4,8 +4,17 @@ export class ServicesDao {
   constructor(model = ServiceModel) {
     this.model = model;
   }
-  getAll(filters = {}) {
-    return this.model.find(filters).lean();
+  getAll(filters = {}, options = {}) {
+    const { page = 1, limit = 10, sortBy = 'createdAt', order = 'asc' } = options;
+    return this.model
+      .find(filters)
+      .sort({ [sortBy]: order === 'desc' ? -1 : 1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+  }
+  count(filters = {}) {
+    return this.model.countDocuments(filters);
   }
   getById(id) {
     return this.model.findById(id).lean();

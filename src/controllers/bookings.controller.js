@@ -14,7 +14,7 @@ function parseId(value, field, res) {
 
 export async function createBooking(req, res) {
   try {
-    const data = await bookingsService.createBooking(req.body);
+    const data = await bookingsService.createBooking(req.validatedBody ?? req.body);
     emitDomainEvent('bookings:changed', { action: 'created', id: data._id });
     return res.status(201).json({ status: 'success', data });
   } catch (error) {
@@ -43,9 +43,10 @@ export async function getBookingById(req, res) {
 }
 
 export async function addServiceToBooking(req, res) {
-  const bookingId = parseId(req.params.bid, 'Id de reserva', res);
+  const params = req.validatedParams ?? req.params;
+  const bookingId = parseId(params.bid, 'Id de reserva', res);
   if (bookingId === null) return undefined;
-  const serviceId = parseId(req.params.sid, 'Id de servicio', res);
+  const serviceId = parseId(params.sid, 'Id de servicio', res);
   if (serviceId === null) return undefined;
   try {
     const data = await bookingsService.addServiceToBooking(bookingId, serviceId);

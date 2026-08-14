@@ -69,3 +69,35 @@ emite `bookings:changed`. El navegador consulta la API REST y actualiza solament
 el contenido afectado, sin recargar la página.
 
 Los parámetros `:sid` y `:bid` son IDs de MongoDB. Las respuestas mantienen el formato `{ status: 'success', data }` o `{ status: 'error', message }`.
+
+### Consultas avanzadas de servicios
+
+`GET /api/services` admite `category`, `available`, `page`, `limit`, `sortBy` y
+`order`. `available` acepta `true` o `false`; `order`, `asc` o `desc`; y
+`sortBy` permite `name`, `category`, `duration`, `price`, `available`,
+`createdAt` y `updatedAt`. El límite máximo es 100.
+
+```http
+GET /api/services?category=salud&available=true&page=2&limit=5&sortBy=price&order=desc
+```
+
+La propiedad `data` continúa siendo el arreglo de servicios y `pagination`
+incluye `total`, `page`, `limit`, `totalPages`, `hasPrevPage` y `hasNextPage`.
+
+### Validaciones y relaciones
+
+Zod valida, antes de consultar MongoDB, la creación y actualización de
+servicios, la creación de reservas, los filtros de servicios y los ObjectId al
+agregar un servicio a una reserva. Los errores responden con estado HTTP 400 y
+un mensaje que identifica los campos inválidos.
+
+Las reservas almacenan cada relación como `{ service: ObjectId, quantity }`.
+Para obtener los datos completos de los servicios relacionados se utiliza:
+
+```http
+GET /api/bookings/64b000000000000000000001
+```
+
+Este endpoint aplica `populate('services.service')`; por eso cada elemento de
+`services` contiene el documento del servicio y su cantidad, sin duplicarlo en
+la colección de reservas.
