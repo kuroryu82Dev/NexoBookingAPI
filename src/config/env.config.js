@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const requiredEnvVars = ['PORT', 'NODE_ENV'];
+const requiredEnvVars = ['PORT', 'MONGO_URI'];
 
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
@@ -12,6 +12,7 @@ for (const envVar of requiredEnvVars) {
 
 export const env = {
   PORT: Number(process.env.PORT),
-  NODE_ENV: process.env.NODE_ENV,
+  APP_NAME: process.env.APP_NAME ?? 'Nexo Booking API',
+  APP_ENV: process.env.APP_ENV ?? process.env.NODE_ENV ?? 'development',
   MONGO_URI: process.env.MONGO_URI
 };

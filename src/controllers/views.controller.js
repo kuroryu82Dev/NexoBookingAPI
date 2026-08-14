@@ -4,7 +4,8 @@ function renderError(res, error) {
   return res.status(500).render('error', {
     pageTitle: 'Error',
     message: 'No fue posible cargar la información.',
-    detail: process.env.NODE_ENV === 'development' ? error.message : undefined
+    detail:
+      (process.env.APP_ENV ?? process.env.NODE_ENV) === 'development' ? error.message : undefined
   });
 }
 

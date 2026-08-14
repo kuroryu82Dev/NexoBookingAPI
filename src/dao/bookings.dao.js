@@ -19,6 +19,9 @@ export class BookingsDao {
   update(id, data) {
     return this.model.findByIdAndUpdate(id, data, { new: true, runValidators: true, lean: true });
   }
+  delete(id) {
+    return this.model.findByIdAndDelete(id).lean();
+  }
 }
 
 export default BookingsDao;

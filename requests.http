@@ -1,13 +1,67 @@
 @baseUrl = http://localhost:8080
+@serviceId = REEMPLAZAR_CON_OBJECT_ID
+@bookingId = REEMPLAZAR_CON_OBJECT_ID
 
-### Listar servicios
-GET {{baseUrl}}/api/services
+### Crear servicio
+POST {{baseUrl}}/api/services
+Content-Type: application/json
 
-### Obtener un servicio por ID
-GET {{baseUrl}}/api/services/64b000000000000000000001
+{
+  "name": "Masaje relajante",
+  "description": "Sesión de masaje de cuerpo completo",
+  "duration": 60,
+  "price": 850,
+  "category": "bienestar",
+  "available": true
+}
 
-### Listar reservas
-GET {{baseUrl}}/api/bookings
+### Listar con filtros, paginación y orden
+GET {{baseUrl}}/api/services?category=bienestar&available=true&page=1&limit=10&sortBy=price&order=asc
 
-### Obtener una reserva por ID
-GET {{baseUrl}}/api/bookings/64b000000000000000000002
+### Consultar y actualizar servicio
+GET {{baseUrl}}/api/services/{{serviceId}}
+
+PUT {{baseUrl}}/api/services/{{serviceId}}
+Content-Type: application/json
+
+{ "available": false }
+
+### Crear reserva
+POST {{baseUrl}}/api/bookings
+Content-Type: application/json
+
+{
+  "clientName": "Ana Pérez",
+  "clientEmail": "ana@example.com",
+  "date": "2026-08-20",
+  "time": "18:00",
+  "status": "PENDIENTE"
+}
+
+### Agregar servicio
+POST {{baseUrl}}/api/bookings/{{bookingId}}/services/{{serviceId}}
+
+### Actualizar cantidad
+PUT {{baseUrl}}/api/bookings/{{bookingId}}/services/{{serviceId}}
+Content-Type: application/json
+
+{ "quantity": 2 }
+
+### Consultar reserva con populate
+GET {{baseUrl}}/api/bookings/{{bookingId}}
+
+### Quitar servicio, vaciar o eliminar reserva
+DELETE {{baseUrl}}/api/bookings/{{bookingId}}/services/{{serviceId}}
+
+DELETE {{baseUrl}}/api/bookings/{{bookingId}}/services
+
+DELETE {{baseUrl}}/api/bookings/{{bookingId}}
+
+### Eliminar servicio
+DELETE {{baseUrl}}/api/services/{{serviceId}}
+
+### Error esperado: servicio incompleto (400)
+POST {{baseUrl}}/api/services
+Content-Type: application/json
+
+{ "name": "" }

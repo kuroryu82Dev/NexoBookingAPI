@@ -1,103 +1,109 @@
 # Nexo Booking API
 
-API REST para gestionar servicios y reservas con MongoDB Atlas, Mongoose y una arquitectura en capas.
+Backend para administrar servicios, reservas y disponibilidad. Incluye consultas avanzadas, validación previa a la base de datos, relaciones entre colecciones y vistas actualizadas mediante WebSockets.
 
-## Requisitos y ejecución
+## Tecnologías utilizadas
 
-- Node.js 20 o superior
-- MongoDB Atlas (o una instancia compatible de MongoDB)
-- npm
+- Node.js 20+
+- Express 5
+- MongoDB y Mongoose
+- Zod
+- Handlebars
+- Socket.IO
+- Node Test Runner
+
+La API utiliza una arquitectura `Router → Controller → Service → Repository → DAO → Mongoose`. Las reglas de negocio y validaciones no se mezclan con rutas ni modelos.
+
+## Instalación
 
 ```bash
+git clone https://github.com/kuroryu82Dev/NexoBookingAPI.git
+cd NexoBookingAPI
 npm install
-copy .env.example .env
-npm start
 ```
 
-Configura `MONGO_URI` en tu `.env` antes de iniciar. Para desarrollo puede usarse `npm run dev` y para ejecutar las pruebas, `npm test`.
+Copia `.env.example` como `.env` y reemplaza la URI de ejemplo. `.env` y `node_modules` están excluidos mediante `.gitignore`.
 
 ## Variables de entorno
 
 ```env
 PORT=8080
-NODE_ENV=development
+APP_NAME=Nexo Booking API
+APP_ENV=development
 MONGO_URI=mongodb+srv://<usuario>:<password>@<cluster>/<database>?retryWrites=true&w=majority
 ```
 
-El archivo `.env` y `node_modules` están ignorados por Git. Nunca deben subirse credenciales reales al repositorio.
+| Variable    | Descripción                     |
+| ----------- | ------------------------------- |
+| `PORT`      | Puerto HTTP de la aplicación.   |
+| `APP_NAME`  | Nombre descriptivo del sistema. |
+| `APP_ENV`   | Entorno de ejecución.           |
+| `MONGO_URI` | Cadena de conexión a MongoDB.   |
 
-## Arquitectura
+## Ejecución
 
-Cada petición recorre este flujo:
-
-```text
-Router → Controller → Service → Repository → DAO → Mongoose → MongoDB
+```bash
+npm start
+npm run dev
+npm test
+npm run format:check
 ```
 
-- `routes`: define las URLs.
-- `controllers`: interpreta HTTP y construye la respuesta.
-- `services`: contiene validaciones y reglas de negocio.
-- `repositories`: desacopla la lógica de negocio de la persistencia.
-- `dao`: consulta los modelos Mongoose.
-- `models`: define las colecciones `services`, `bookings` y `messages`.
-- `config/database.js`: administra la conexión con MongoDB.
+La API queda disponible en `http://localhost:8080` o en el puerto configurado.
 
-En una reserva, cada servicio se almacena como `{ service: ObjectId, quantity: Number }`; no se duplica el objeto completo. Si se agrega el mismo servicio nuevamente, se incrementa su cantidad.
+## Endpoints principales
 
-## Endpoints
+### Servicios
 
-| Método | URL                                | Descripción                                      |
-| ------ | ---------------------------------- | ------------------------------------------------ |
-| GET    | `/api/services`                    | Lista servicios; acepta `category` y `available` |
-| GET    | `/api/services/:sid`               | Obtiene un servicio                              |
-| POST   | `/api/services`                    | Crea un servicio                                 |
-| PUT    | `/api/services/:sid`               | Actualiza un servicio                            |
-| DELETE | `/api/services/:sid`               | Elimina un servicio                              |
-| GET    | `/api/bookings`                    | Lista reservas                                   |
-| POST   | `/api/bookings`                    | Crea una reserva                                 |
-| GET    | `/api/bookings/:bid`               | Obtiene una reserva                              |
-| POST   | `/api/bookings/:bid/services/:sid` | Agrega un servicio a una reserva                 |
+| Método   | Endpoint             | Acción                              |
+| -------- | -------------------- | ----------------------------------- |
+| `GET`    | `/api/services`      | Listar, filtrar, ordenar y paginar. |
+| `GET`    | `/api/services/:sid` | Consultar un servicio.              |
+| `POST`   | `/api/services`      | Crear un servicio.                  |
+| `PUT`    | `/api/services/:sid` | Actualizar un servicio.             |
+| `DELETE` | `/api/services/:sid` | Eliminar un servicio.               |
 
-## Vistas y tiempo real
-
-- `GET /views/services`: catálogo renderizado con Handlebars desde MongoDB.
-- `GET /views/availability`: reservas y servicios disponibles desde MongoDB.
-
-Express y Socket.io comparten el mismo servidor HTTP. Los cambios exitosos en
-servicios emiten `services:changed`; crear una reserva o agregarle un servicio
-emite `bookings:changed`. El navegador consulta la API REST y actualiza solamente
-el contenido afectado, sin recargar la página.
-
-Los parámetros `:sid` y `:bid` son IDs de MongoDB. Las respuestas mantienen el formato `{ status: 'success', data }` o `{ status: 'error', message }`.
-
-### Consultas avanzadas de servicios
-
-`GET /api/services` admite `category`, `available`, `page`, `limit`, `sortBy` y
-`order`. `available` acepta `true` o `false`; `order`, `asc` o `desc`; y
-`sortBy` permite `name`, `category`, `duration`, `price`, `available`,
-`createdAt` y `updatedAt`. El límite máximo es 100.
+Acepta `category`, `available`, `page`, `limit`, `sortBy` y `order`:
 
 ```http
 GET /api/services?category=salud&available=true&page=2&limit=5&sortBy=price&order=desc
 ```
 
-La propiedad `data` continúa siendo el arreglo de servicios y `pagination`
-incluye `total`, `page`, `limit`, `totalPages`, `hasPrevPage` y `hasNextPage`.
+La respuesta incluye `total`, `page`, `limit`, `totalPages`, `hasPrevPage` y `hasNextPage` dentro de `pagination`.
 
-### Validaciones y relaciones
+### Reservas
 
-Zod valida, antes de consultar MongoDB, la creación y actualización de
-servicios, la creación de reservas, los filtros de servicios y los ObjectId al
-agregar un servicio a una reserva. Los errores responden con estado HTTP 400 y
-un mensaje que identifica los campos inválidos.
+| Método   | Endpoint                           | Acción                                         |
+| -------- | ---------------------------------- | ---------------------------------------------- |
+| `GET`    | `/api/bookings`                    | Listar reservas.                               |
+| `POST`   | `/api/bookings`                    | Crear una reserva.                             |
+| `GET`    | `/api/bookings/:bid`               | Consultar con servicios completos.             |
+| `POST`   | `/api/bookings/:bid/services/:sid` | Agregar un servicio o incrementar su cantidad. |
+| `PUT`    | `/api/bookings/:bid/services/:sid` | Establecer cantidad con `{ "quantity": 2 }`.   |
+| `DELETE` | `/api/bookings/:bid/services/:sid` | Quitar un servicio.                            |
+| `DELETE` | `/api/bookings/:bid/services`      | Vaciar los servicios.                          |
+| `DELETE` | `/api/bookings/:bid`               | Eliminar la reserva.                           |
 
-Las reservas almacenan cada relación como `{ service: ObjectId, quantity }`.
-Para obtener los datos completos de los servicios relacionados se utiliza:
+Cada relación se almacena como `{ service: ObjectId, quantity: Number }`. `GET /api/bookings/:bid` ejecuta `populate('services.service')`, sin duplicar el servicio en la reserva.
 
-```http
-GET /api/bookings/64b000000000000000000001
-```
+## Validaciones y errores
 
-Este endpoint aplica `populate('services.service')`; por eso cada elemento de
-`services` contiene el documento del servicio y su cantidad, sin duplicarlo en
-la colección de reservas.
+Zod valida antes de acceder a MongoDB la creación y actualización de servicios, creación de reservas, filtros, identificadores y cantidades. Los datos inválidos responden `400`; los recursos inexistentes, `404`, con `{ "status": "error", "message": "..." }`.
+
+## Vistas y WebSockets
+
+- `/services`: catálogo de servicios.
+- `/realtime-services`: catálogo conectado a Socket.IO.
+- `/availability`: reservas y servicios disponibles.
+
+Los cambios en servicios emiten `services:changed`; los cambios en reservas, `bookings:changed`. Las vistas se sincronizan sin recargar. Las URLs anteriores bajo `/views` siguen disponibles.
+
+## Pruebas manuales
+
+`requests.http` contiene solicitudes listas para VS Code REST Client o herramientas compatibles. Incluye CRUD de servicios, ciclo de reservas, `populate` y un caso inválido.
+
+## Notas adicionales
+
+- No se incluyen credenciales, `.env`, `node_modules` ni archivos temporales.
+- Los datos en `src/data` pertenecen a módulos heredados basados en archivos; `/api/services` y `/api/bookings` usan MongoDB.
+- La arquitectura por capas permite ampliar el sistema e integrarlo con el POS de Nexo.

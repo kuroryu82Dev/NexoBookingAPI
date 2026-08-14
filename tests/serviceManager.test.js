@@ -1,17 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import os from 'node:os';
+import path from 'node:path';
 import ServiceManager from '../src/managers/ServiceManager.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 function createTempFile(name) {
-  const tempFile = path.join(__dirname, name);
-  fs.rmSync(tempFile, { force: true });
-  return tempFile;
+  return path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'nexo-services-')), name);
 }
 
 test('addService generates an id and stores a valid service', () => {
