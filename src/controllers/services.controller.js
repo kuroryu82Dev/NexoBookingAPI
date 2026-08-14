@@ -13,19 +13,15 @@ function parseId(value, res) {
 }
 
 export async function getServices(req, res) {
-  const { category, available } = req.query;
-  if (category !== undefined && (typeof category !== 'string' || !category.trim()))
-    return jsonError(res, 400, 'El filtro category debe ser una cadena no vacía');
-  if (available !== undefined && !['true', 'false'].includes(available))
-    return jsonError(res, 400, 'El filtro available debe ser true o false');
   try {
-    const data = await servicesService.getServices({
-      category,
-      available: available === undefined ? undefined : available === 'true'
+    const result = await servicesService.getServices(req.validatedQuery ?? req.query);
+    return res.status(200).json({
+      status: 'success',
+      data: result.services,
+      pagination: result.pagination
     });
-    return res.status(200).json({ status: 'success', data });
   } catch (error) {
-    return jsonError(res, 500, error.message);
+    return jsonError(res, error.statusCode ?? 400, error.message);
   }
 }
 
@@ -45,7 +41,7 @@ export async function getServiceById(req, res) {
 
 export async function createService(req, res) {
   try {
-    const data = await servicesService.createService(req.body);
+    const data = await servicesService.createService(req.validatedBody ?? req.body);
     emitDomainEvent('services:changed', { action: 'created', id: data._id });
     return res.status(201).json({ status: 'success', data });
   } catch (error) {
@@ -57,7 +53,7 @@ export async function updateService(req, res) {
   const id = parseId(req.params.sid ?? req.params.id, res);
   if (id === null) return undefined;
   try {
-    const data = await servicesService.updateService(id, req.body);
+    const data = await servicesService.updateService(id, req.validatedBody ?? req.body);
     if (!data) return jsonError(res, 404, 'Servicio no encontrado');
     emitDomainEvent('services:changed', { action: 'updated', id: data._id });
     return res.status(200).json({ status: 'success', data });

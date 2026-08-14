@@ -26,8 +26,10 @@ const data = [
 
 test('getAllServices transmite filtros a la persistencia MongoDB', async (t) => {
   const original = servicesRepository.dao.getAll;
+  const originalCount = servicesRepository.dao.count;
   t.after(() => {
     servicesRepository.dao.getAll = original;
+    servicesRepository.dao.count = originalCount;
   });
   servicesRepository.dao.getAll = async (filters) =>
     data.filter((item) =>
@@ -35,10 +37,17 @@ test('getAllServices transmite filtros a la persistencia MongoDB', async (t) => 
         value instanceof RegExp ? value.test(item[key]) : item[key] === value
       )
     );
+  servicesRepository.dao.count = async (filters) =>
+    data.filter((item) =>
+      Object.entries(filters).every(([key, value]) =>
+        value instanceof RegExp ? value.test(item[key]) : item[key] === value
+      )
+    ).length;
   const res = createResponse();
   await getAllServices({ query: { category: 'RESERVAS', available: 'true' } }, res);
   assert.equal(res.statusCode, 200);
   assert.deepEqual(res.body.data, [{ category: 'reservas', available: true }]);
+  assert.equal(res.body.pagination.total, 1);
 });
 
 test('getAllServices rechaza available inválido', async () => {

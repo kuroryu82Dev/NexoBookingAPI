@@ -52,7 +52,7 @@ export class BookingsService {
   }
 
   async addServiceToBooking(bookingId, serviceId) {
-    const booking = await this.bookingsRepository.getById(bookingId);
+    const booking = await this.bookingsRepository.getByIdRaw(bookingId);
     if (!booking) throw notFound('Reserva no encontrada');
     if (!(await this.servicesRepository.getById(serviceId)))
       throw notFound('Servicio no encontrado');
